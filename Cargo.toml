@@ -1,0 +1,47 @@
+[package]
+name = "monad-sonar"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-3.0"
+description = "Read the Monad validator peer set without running a node."
+repository = "https://github.com/ColinkaMir/monad-sonar"
+readme = "README.md"
+keywords = ["monad", "peers", "discovery", "validators", "p2p"]
+categories = ["command-line-utilities", "network-programming"]
+
+[[bin]]
+name = "monad-sonar"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "time", "signal"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+hex = "0.4"
+toml = "0.8"
+futures = "0.3"
+
+# Monad crates: the official networking + discovery stack from category-labs/monad-bft (GPL-3.0),
+# pinned to a rev. Cargo fetches the repo and its submodules; only these crates compile (the C++
+# execution/triedb engine is never built). To hack locally against a sibling checkout, point these
+# at `path = "../monad-bft/<crate>"` instead.
+monad-peer-discovery = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-secp = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-crypto = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-types = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-node-config = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f", features = ["crypto"] }
+monad-state = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-router-multi = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-dataplane = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-raptorcast = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-wireauth = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-peer-score = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-consensus-types = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-executor-glue = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-executor = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+monad-validator = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
+rand = "0.8"
+rand_chacha = "0.3"

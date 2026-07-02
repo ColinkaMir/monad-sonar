@@ -1,0 +1,7 @@
+/target
+# generated discovery output
+peers.json
+*.pcap
+# local active-set snapshot (copy from configs/validators.example.toml or fetch via RPC)
+configs/validators.toml
+.env
