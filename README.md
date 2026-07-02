@@ -60,8 +60,16 @@ The crawler **auto-detects its public IP** and advertises it in its own name rec
 match the source IP of its packets or peers reject it (auth-UDP proves IP ownership) and discovery
 returns nothing — so behind NAT / on a multi-homed host, set it explicitly with `--public-ip <ip>`.
 
-Both **testnet** and **mainnet** are first-class (`--network`); a mainnet bootstrap seed is on the
-roadmap.
+Both **testnet** and **mainnet** are first-class (`--network`), each with a ready config
+(`configs/testnet.toml`, `configs/mainnet.toml`):
+
+```
+# mainnet
+monad-sonar --network mainnet peers \
+  --config configs/mainnet.toml --out mainnet-peers.json --run-secs 100
+```
+
+A ~70s mainnet pass discovers ~120 peer name records from the 8 seed peers.
 
 ### Output
 
