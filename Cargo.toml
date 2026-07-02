@@ -45,3 +45,4 @@ monad-executor = { git = "https://github.com/category-labs/monad-bft", rev = "41
 monad-validator = { git = "https://github.com/category-labs/monad-bft", rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f" }
 rand = "0.8"
 rand_chacha = "0.3"
+ureq = { version = "2", features = ["json"] }

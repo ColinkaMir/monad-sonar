@@ -42,20 +42,23 @@ networking/discovery crates compile; the C++ execution engine is never built.)
 
 ## Usage
 
-`monad-sonar` needs two inputs next to each other:
-
-- a **node-style config** (`--config`) describing the bind ports and a handful of bootstrap peers
-  (see `configs/testnet.toml`), and
-- a **`validators.toml`** sibling of that config listing the current active-set node ids — the
-  PeerLookup targets. A snapshot is provided; copy it (or, later, fetch it from RPC):
+All it needs is a **node-style config** (`--config`) describing the bind ports and a handful of
+bootstrap peers (see `configs/testnet.toml`):
 
 ```
-cp configs/validators.example.toml configs/validators.toml
-
 # discover the testnet peer set for ~100s and write JSON
 monad-sonar --network testnet peers \
   --config configs/testnet.toml --out peers.json --run-secs 100
 ```
+
+The active validator set (the PeerLookup targets) and the current epoch are read **live from the
+public JSON-RPC** — so no node and no local snapshot are required. Override with `--rpc <url>`; for
+offline use, drop a `validators.toml` next to `--config` (see `configs/validators.example.toml`) and
+that snapshot is used instead.
+
+The crawler **auto-detects its public IP** and advertises it in its own name record. This IP must
+match the source IP of its packets or peers reject it (auth-UDP proves IP ownership) and discovery
+returns nothing — so behind NAT / on a multi-homed host, set it explicitly with `--public-ip <ip>`.
 
 Both **testnet** and **mainnet** are first-class (`--network`); a mainnet bootstrap seed is on the
 roadmap.

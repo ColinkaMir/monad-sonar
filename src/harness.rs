@@ -8,7 +8,7 @@
 
 use std::{
     collections::{BTreeMap, BTreeSet},
-    net::{IpAddr, SocketAddr},
+    net::{IpAddr, Ipv4Addr, SocketAddr},
     num::NonZeroU16,
     path::PathBuf,
     sync::Arc,
@@ -54,6 +54,7 @@ pub fn build_discovery_router(
     epoch_validator_map: BTreeMap<Epoch, BTreeSet<NodeId<CertificateSignaturePubKey<ST>>>>,
     current_epoch: Epoch,
     current_round: Round,
+    advertised_ip: Option<Ipv4Addr>,
     persisted_peers_path: PathBuf,
 ) -> MultiRouter<ST, MonadMsg, VerifiedMonadMsg, monad_executor_glue::MonadEvent<ST, SCT, EPT>, PeerDiscovery<ST>, WireAuthProtocol, ScoreReader> {
     let peer_discovery_config = node_config.peer_discovery.clone();
@@ -87,7 +88,10 @@ pub fn build_discovery_router(
 
     let self_id = NodeId::new(identity.pubkey());
     let self_tcp_port = peer_discovery_config.tcp_port();
-    let self_ip = peer_discovery_config.ip().expect("self endpoint must be an IP");
+    // The advertised IP MUST equal our packet source IP: auth-UDP proves IP ownership, so peers
+    // silently drop us (0 pongs) if the name record claims an address we don't send from.
+    let self_ip = advertised_ip
+        .unwrap_or_else(|| peer_discovery_config.ip().expect("self endpoint must be an IP"));
 
     let self_record = NameRecord::new_with_ports(
         self_ip,
@@ -194,11 +198,21 @@ use monad_secp::KeyPair;
 /// `[[validator_sets]]` with `epoch` + `[[validator_sets.validators]]` with `node_id`) into the
 /// epoch -> {NodeId} map peer-discovery uses as PeerLookup targets. Keeps only `current_epoch`
 /// (and any later sets present), which is what discovery actively looks up.
-fn load_epoch_validators(
+type ValidatorMap = BTreeMap<Epoch, BTreeSet<NodeId<CertificateSignaturePubKey<ST>>>>;
+
+fn node_id_from_hex(secp_hex: &str) -> Result<NodeId<CertificateSignaturePubKey<ST>>, Box<dyn std::error::Error>> {
+    let bytes = hex::decode(secp_hex.trim_start_matches("0x"))?;
+    let pk = <CertificateSignaturePubKey<ST> as PubKey>::from_bytes(&bytes)
+        .map_err(|e| format!("bad validator secp {secp_hex}: {e:?}"))?;
+    Ok(NodeId::new(pk))
+}
+
+/// OFFLINE fallback: read the active set from a validators.toml snapshot ([[validator_sets]] with
+/// `epoch` + [[validator_sets.validators]] with `node_id`). Returns the map plus the newest epoch
+/// found (used as current_epoch).
+fn load_epoch_validators_file(
     path: &Path,
-    current_epoch: Epoch,
-) -> Result<BTreeMap<Epoch, BTreeSet<NodeId<CertificateSignaturePubKey<ST>>>>, Box<dyn std::error::Error>>
-{
+) -> Result<(Epoch, ValidatorMap), Box<dyn std::error::Error>> {
     #[derive(serde::Deserialize)]
     struct File {
         validator_sets: Vec<Set>,
@@ -213,29 +227,54 @@ fn load_epoch_validators(
         node_id: String,
     }
 
-    let mut map: BTreeMap<Epoch, BTreeSet<NodeId<CertificateSignaturePubKey<ST>>>> = BTreeMap::new();
-    let text = match std::fs::read_to_string(path) {
-        Ok(t) => t,
-        Err(e) => {
-            tracing::warn!(?path, ?e, "no validators file; PeerLookup disabled (bootstrap only)");
-            return Ok(map);
-        }
-    };
-    let file: File = toml::from_str(&text)?;
+    let file: File = toml::from_str(&std::fs::read_to_string(path)?)?;
+    let mut map: ValidatorMap = BTreeMap::new();
+    let mut newest = 0u64;
     for set in file.validator_sets {
-        if set.epoch < current_epoch.0 {
-            continue;
-        }
+        newest = newest.max(set.epoch);
         let mut ids = BTreeSet::new();
         for v in set.validators {
-            let bytes = hex::decode(v.node_id.trim_start_matches("0x"))?;
-            let pk = <CertificateSignaturePubKey<ST> as PubKey>::from_bytes(&bytes)
-                .map_err(|e| format!("bad validator node_id {}: {e:?}", v.node_id))?;
-            ids.insert(NodeId::new(pk));
+            ids.insert(node_id_from_hex(&v.node_id)?);
         }
         map.insert(Epoch(set.epoch), ids);
     }
-    Ok(map)
+    Ok((Epoch(newest), map))
+}
+
+/// PRIMARY (node-independent): read the current epoch, round proxy, and the active consensus set's
+/// secp node ids straight from the staking precompile over public RPC. One getValidator call per
+/// validator, so this takes a few seconds for a full set.
+fn fetch_epoch_validators_rpc(
+    rpc_url: &str,
+) -> Result<(Epoch, Round, ValidatorMap), Box<dyn std::error::Error>> {
+    let rpc = crate::rpc::Rpc::new(rpc_url);
+    let epoch = rpc.current_epoch()?;
+    let round = rpc.round_proxy()?;
+    let ids = rpc.consensus_validator_ids()?;
+    tracing::info!(epoch, round, validators = ids.len(), "monad-sonar: RPC active set, fetching secp keys");
+    let mut set = BTreeSet::new();
+    for id in &ids {
+        match rpc.validator_secp(*id) {
+            Ok(bytes) => {
+                set.insert(node_id_from_hex(&hex::encode(bytes))?);
+            }
+            Err(e) => tracing::warn!(id, error = %e, "skipping validator (secp fetch failed)"),
+        }
+    }
+    let mut map: ValidatorMap = BTreeMap::new();
+    map.insert(Epoch(epoch), set);
+    Ok((Epoch(epoch), Round(round), map))
+}
+
+/// Best-effort public-IP discovery via a plain HTTP echo service. Returns None on any failure
+/// (offline, service down) — the caller then falls back to the config's advertised address.
+fn detect_public_ip() -> Option<Ipv4Addr> {
+    let ip = ureq::get("https://api.ipify.org")
+        .call()
+        .ok()?
+        .into_string()
+        .ok()?;
+    ip.trim().parse().ok()
 }
 
 /// Run discovery: load config, generate a throwaway identity, drive the router's stream so
@@ -245,25 +284,39 @@ pub async fn run_peers(
     out: Option<PathBuf>,
     _watch: Option<u64>,
     run_secs: u64,
+    rpc_url: &str,
+    public_ip: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let config: MonadNodeConfig = toml::from_str(&std::fs::read_to_string(config_path)?)?;
     let mut secret: [u8; 32] = rand::random();
     let identity = KeyPair::from_bytes(&mut secret)?;
 
+    // Resolve the IP we advertise: explicit flag > auto-detected public IP > whatever the config
+    // says. It must match our real source IP or peers reject us (auth-UDP IP-ownership check).
+    let advertised_ip: Option<Ipv4Addr> = match public_ip {
+        Some(s) => Some(s.parse().map_err(|e| format!("bad --public-ip {s}: {e}"))?),
+        None => detect_public_ip(),
+    };
+    if let Some(ip) = advertised_ip {
+        tracing::info!(%ip, "monad-sonar: advertising this public IP (must match our source IP)");
+    }
+
     let persisted = std::env::temp_dir().join("monad-sonar-peers.toml");
     let _ = std::fs::remove_file(&persisted);
 
-    // TODO(product): epoch/round are hardcoded placeholders (a recent testnet snapshot) and WILL
-    // go stale as the epoch advances. Source them from a reference RPC (consensus/getValidator).
-    let current_epoch = Epoch(839);
-    let current_round = Round(42316863);
-
-    // PeerLookup targets = the active validator set. Load NodeIds from a validators.toml-format
-    // file (sibling of the node config, or supplied out-of-band). Without these the crawler can
-    // only maintain bootstrap peers; with them it issues targeted PeerLookups and expands.
-    let validators_path = config_path.with_file_name("validators.toml");
-    let epoch_validator_map = load_epoch_validators(&validators_path, current_epoch)?;
+    // PeerLookup targets = the active validator set; discovery also needs the current epoch (round
+    // is not load-bearing for discovery). Source of truth: the live chain via public RPC
+    // (node-independent). Offline fallback: a `validators.toml` snapshot next to --config.
+    let validators_file = config_path.with_file_name("validators.toml");
+    let (current_epoch, current_round, epoch_validator_map) = if validators_file.exists() {
+        let (epoch, map) = load_epoch_validators_file(&validators_file)?;
+        tracing::info!(?validators_file, epoch = epoch.0, "monad-sonar: active set from local snapshot (offline)");
+        (epoch, Round(epoch.0), map)
+    } else {
+        fetch_epoch_validators_rpc(rpc_url)?
+    };
     tracing::info!(
+        epoch = current_epoch.0,
         validators = epoch_validator_map.get(&current_epoch).map(|s| s.len()).unwrap_or(0),
         "monad-sonar: loaded active validator set"
     );
@@ -275,6 +328,7 @@ pub async fn run_peers(
         epoch_validator_map,
         current_epoch,
         current_round,
+        advertised_ip,
         persisted.clone(),
     );
     let mut router = Box::pin(router);

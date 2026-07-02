@@ -18,7 +18,7 @@ statesync_max_concurrent_requests = 5
 chain_id = 10143
 
 [peer_discovery]
-self_address = "203.0.113.1:8300"    # advertised endpoint: set to your host's public IP (RFC5737 example here)
+self_address = "203.0.113.1:8300"    # placeholder; the crawler auto-detects your real public IP at runtime (override with --public-ip)
 self_auth_port = 8301
 self_record_seq_num = 2
 self_name_record_sig = "acae31d29ddcd52e98bbfb8f8bd6ec6c4f4474092366d3c78009963b60245a911c8b46cd96ea26f5838506f9d0d9f40c49ff46fdf6e0c9853b8fd8e3d045a0c601" # Name Record Signature
