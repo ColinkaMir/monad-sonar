@@ -22,13 +22,13 @@ self_address = "203.0.113.1:8300"    # placeholder; the crawler auto-detects you
 self_auth_port = 8301
 self_record_seq_num = 2
 self_name_record_sig = "acae31d29ddcd52e98bbfb8f8bd6ec6c4f4474092366d3c78009963b60245a911c8b46cd96ea26f5838506f9d0d9f40c49ff46fdf6e0c9853b8fd8e3d045a0c601" # Name Record Signature
-refresh_period = 4
+refresh_period = 15
 request_timeout = 5
 unresponsive_prune_threshold = 3
 last_participation_prune_threshold = 1000
 min_num_peers = 90
 max_num_peers = 450
-ping_rate_limit_per_second = 100
+ping_rate_limit_per_second = 25
 
 [fullnode_raptorcast]
 enable_publisher = true

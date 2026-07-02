@@ -68,6 +68,12 @@ enum Command {
         /// nothing. Auto-detected if unset; override here when auto-detect is wrong (NAT, multi-homed).
         #[arg(long)]
         public_ip: Option<String>,
+        /// Path to a persistent identity key (32-byte secp secret). Created on first use and reused
+        /// after, so peers see one stable identity instead of a new one each run (a fresh identity
+        /// every time trips per-source anti-DoS and gets the crawler throttled). Defaults next to
+        /// --config as `monad-sonar-identity.key`.
+        #[arg(long)]
+        identity: Option<PathBuf>,
     },
 }
 
@@ -79,10 +85,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let cli = Cli::parse();
     match cli.command {
-        Command::Peers { config, out, watch, run_secs, rpc, public_ip } => {
+        Command::Peers { config, out, watch, run_secs, rpc, public_ip, identity } => {
             let rpc_url = rpc.unwrap_or_else(|| cli.network.default_rpc().to_string());
+            let identity_path =
+                identity.unwrap_or_else(|| config.with_file_name("monad-sonar-identity.key"));
             tracing::info!(network = ?cli.network, chain_id = cli.network.chain_id(), %rpc_url, "monad-sonar");
-            harness::run_peers(&config, out, watch, run_secs, &rpc_url, public_ip).await?;
+            harness::run_peers(&config, out, watch, run_secs, &rpc_url, public_ip, &identity_path).await?;
         }
     }
     Ok(())

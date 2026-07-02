@@ -266,6 +266,32 @@ fn fetch_epoch_validators_rpc(
     Ok((Epoch(epoch), Round(round), map))
 }
 
+/// Load a persistent identity from `path`, or create one (32-byte secp secret, 0600) on first use.
+/// Reusing one identity across runs keeps peers from seeing a flood of fresh identities from our IP
+/// (which trips their anti-DoS and gets us throttled to zero pongs).
+fn load_or_create_identity(path: &Path) -> Result<KeyPair, Box<dyn std::error::Error>> {
+    if path.exists() {
+        let mut bytes = std::fs::read(path)?;
+        if bytes.len() != 32 {
+            return Err(format!("identity {path:?}: expected 32 bytes, got {}", bytes.len()).into());
+        }
+        let kp = KeyPair::from_bytes(&mut bytes)?;
+        tracing::info!(?path, "monad-sonar: loaded persistent identity");
+        Ok(kp)
+    } else {
+        let mut secret: [u8; 32] = rand::random();
+        std::fs::write(path, secret)?; // write before from_bytes (which may consume the buffer)
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o600));
+        }
+        let kp = KeyPair::from_bytes(&mut secret)?;
+        tracing::info!(?path, "monad-sonar: created persistent identity");
+        Ok(kp)
+    }
+}
+
 /// Best-effort public-IP discovery via a plain HTTP echo service. Returns None on any failure
 /// (offline, service down) — the caller then falls back to the config's advertised address.
 fn detect_public_ip() -> Option<Ipv4Addr> {
@@ -286,10 +312,10 @@ pub async fn run_peers(
     run_secs: u64,
     rpc_url: &str,
     public_ip: Option<String>,
+    identity_path: &Path,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let config: MonadNodeConfig = toml::from_str(&std::fs::read_to_string(config_path)?)?;
-    let mut secret: [u8; 32] = rand::random();
-    let identity = KeyPair::from_bytes(&mut secret)?;
+    let identity = load_or_create_identity(identity_path)?;
 
     // Resolve the IP we advertise: explicit flag > auto-detected public IP > whatever the config
     // says. It must match our real source IP or peers reject us (auth-UDP IP-ownership check).

@@ -5,3 +5,7 @@ peers.json
 # local active-set snapshot (copy from configs/validators.example.toml or fetch via RPC)
 configs/validators.toml
 .env
+
+# persistent identity secret (private)
+*identity*.key
+configs/monad-sonar-identity.key
