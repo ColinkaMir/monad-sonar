@@ -28,17 +28,14 @@ host. `monad-sonar` does **only discovery** — light, isolated, safe.
 ## Build
 
 ```
-cargo build --release        # Cargo fetches category-labs/monad-bft (pinned) and its submodules
+cargo build --release        # light: only the ~15 networking crates + crates.io deps
 ```
 
-No local checkout of `monad-bft` is required — the dependency is a pinned git rev. (Only the
-networking/discovery crates compile; the C++ execution engine is never built.)
-
-> **Heads-up on the first build:** because the crates live in the large `monad-bft` workspace,
-> Cargo fetches that whole repository and its submodules — on the order of **~4–5 GB** the first
-> time (cached afterwards). None of the heavy C++ `monad-execution` submodule is compiled; it is
-> only pulled during dependency resolution. A leaner packaging (just the networking crates) is on
-> the roadmap.
+The handful of `category-labs/monad-bft` crates this needs (plus the `category-labs/monoio` fork)
+are **vendored** under `vendor/` (~7 MB), so building does **not** clone the large `monad-bft`
+monorepo or its submodules — no ~4–5 GB pull of the C++ `monad-execution` engine and ethereum test
+vectors we never compile. Everything else comes from crates.io as usual. See `.cargo/config.toml`
+for the source mapping; to build against upstream instead, remove that file.
 
 ## Usage
 

@@ -1,0 +1,229 @@
+// Copyright (C) 2025 Category Labs, Inc.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+use std::{cmp::Ordering, io::Error, iter};
+
+use crate::r10::nonsystematic::decoder::{BufferId, Decoder};
+
+// We switch from doing peeling only to performing inactivation decoding when
+// num_received_encoded_symbols >= (MULTIPLIER * num_source_symbols) >> SHIFT .
+const INACTIVATION_SYMBOL_THRESHOLD_MULTIPLIER: usize = 384;
+const INACTIVATION_SYMBOL_THRESHOLD_SHIFT: usize = 8;
+
+#[derive(Debug)]
+struct BufferSet {
+    num_temp_buffers: usize,
+    buffers: Vec<Box<[u8]>>,
+}
+
+impl BufferSet {
+    pub fn new(num_temp_buffers: usize, symbol_len: usize) -> BufferSet {
+        let buffers: Vec<Box<[u8]>> =
+            iter::repeat_n(vec![0; symbol_len].into_boxed_slice(), num_temp_buffers).collect();
+
+        BufferSet {
+            num_temp_buffers,
+            buffers,
+        }
+    }
+
+    pub fn push_buffer(&mut self, buf: Box<[u8]>) {
+        self.buffers.push(buf);
+    }
+
+    fn buffer_index(&self, buffer_id: BufferId) -> usize {
+        match buffer_id {
+            BufferId::TempBuffer { index } => index,
+            BufferId::ReceiveBuffer { index } => self.num_temp_buffers + index,
+        }
+    }
+
+    #[inline(always)]
+    fn xor_bytes(dst: &mut [u8], src: &[u8]) {
+        assert_eq!(dst.len(), src.len());
+
+        #[cfg(all(
+            any(target_arch = "x86", target_arch = "x86_64"),
+            target_feature = "avx2"
+        ))]
+        {
+            let (dst_chunks, dst_tail) = dst.as_chunks_mut::<32>();
+            let (src_chunks, src_tail) = src.as_chunks::<32>();
+
+            for (dst_chunk, src_chunk) in dst_chunks.iter_mut().zip(src_chunks) {
+                unsafe {
+                    Self::xor_chunk_avx2(dst_chunk, src_chunk);
+                }
+            }
+
+            Self::xor_bytes_scalar(dst_tail, src_tail);
+        }
+
+        #[cfg(not(all(
+            any(target_arch = "x86", target_arch = "x86_64"),
+            target_feature = "avx2"
+        )))]
+        Self::xor_bytes_scalar(dst, src);
+    }
+
+    #[inline(always)]
+    fn xor_bytes_scalar(dst: &mut [u8], src: &[u8]) {
+        for (dst_byte, src_byte) in dst.iter_mut().zip(src) {
+            *dst_byte ^= *src_byte;
+        }
+    }
+
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        target_feature = "avx2"
+    ))]
+    #[target_feature(enable = "avx2")]
+    unsafe fn xor_chunk_avx2(dst: &mut [u8; 32], src: &[u8; 32]) {
+        #[cfg(target_arch = "x86")]
+        use std::arch::x86::{__m256i, _mm256_loadu_si256, _mm256_storeu_si256, _mm256_xor_si256};
+        #[cfg(target_arch = "x86_64")]
+        use std::arch::x86_64::{
+            __m256i, _mm256_loadu_si256, _mm256_storeu_si256, _mm256_xor_si256,
+        };
+
+        let dst_ptr = dst.as_mut_ptr().cast::<__m256i>();
+        let src_ptr = src.as_ptr().cast::<__m256i>();
+        let dst_vec = unsafe { _mm256_loadu_si256(dst_ptr.cast_const()) };
+        let src_vec = unsafe { _mm256_loadu_si256(src_ptr) };
+        let xor_vec = _mm256_xor_si256(dst_vec, src_vec);
+
+        unsafe {
+            _mm256_storeu_si256(dst_ptr, xor_vec);
+        }
+    }
+
+    pub fn xor_buffers(&mut self, a: BufferId, b: BufferId) {
+        let a_index = self.buffer_index(a);
+        let b_index = self.buffer_index(b);
+
+        // Split the borrow to be able to get a mutable reference and an immutable
+        // reference to different elements of the slice without using unsafe code.
+        // (This essentially emulates std::slice::get_many_mut().)
+        let (dst, src) = match a_index.cmp(&b_index) {
+            Ordering::Less => {
+                let (first, second) = self.buffers.split_at_mut(b_index);
+                (&mut first[a_index], &second[0])
+            }
+            Ordering::Greater => {
+                let (first, second) = self.buffers.split_at_mut(a_index);
+                (&mut second[0], &first[b_index])
+            }
+            Ordering::Equal => panic!("xor_buffers: Was asked to XOR buffer with itself"),
+        };
+
+        Self::xor_bytes(dst, src);
+    }
+
+    pub fn buffer(&self, buffer_id: BufferId) -> &[u8] {
+        &self.buffers[self.buffer_index(buffer_id)]
+    }
+}
+
+#[derive(Debug)]
+pub struct ManagedDecoder {
+    num_source_symbols: usize,
+    symbol_len: usize,
+    decoder: Decoder,
+    buffer_set: BufferSet,
+}
+
+impl ManagedDecoder {
+    pub fn new(
+        num_source_symbols: usize,
+        encoded_symbol_capacity: usize,
+        symbol_len: usize,
+    ) -> Result<ManagedDecoder, Error> {
+        let decoder = Decoder::with_capacity(num_source_symbols, encoded_symbol_capacity)?;
+
+        let buffer_set = BufferSet::new(decoder.num_temp_buffers_required(), symbol_len);
+
+        Ok(ManagedDecoder {
+            num_source_symbols,
+            symbol_len,
+            decoder,
+            buffer_set,
+        })
+    }
+
+    // TODO: Explore accepting Bytes as data, making rx_buffers a vector of enums
+    // designating either an owned Box<[u8]> or an un-owned Bytes, and converting
+    // un-owned to owned buffers whenever they are targeted for XORing.
+    pub fn received_encoded_symbol(&mut self, data: &[u8], encoding_symbol_id: usize) {
+        if self.symbol_len != data.len() {
+            panic!(
+                "ManagedDecoder expected symbol of length = {} given symbol of length {}",
+                self.symbol_len,
+                data.len()
+            );
+        }
+
+        let buf: Box<[u8]> = data.into();
+
+        self.buffer_set.push_buffer(buf);
+
+        self.decoder
+            .received_encoded_symbol(encoding_symbol_id, |a, b| self.buffer_set.xor_buffers(a, b));
+    }
+
+    pub fn num_source_symbols(&self) -> usize {
+        self.num_source_symbols
+    }
+
+    pub fn symbol_len(&self) -> usize {
+        self.symbol_len
+    }
+
+    pub fn inactivation_symbol_threshold(&self) -> usize {
+        (INACTIVATION_SYMBOL_THRESHOLD_MULTIPLIER * self.num_source_symbols)
+            >> INACTIVATION_SYMBOL_THRESHOLD_SHIFT
+    }
+
+    pub fn try_decode(&mut self) -> bool {
+        self.decoder
+            .try_decode(self.inactivation_symbol_threshold(), |a, b| {
+                self.buffer_set.xor_buffers(a, b)
+            })
+    }
+
+    pub fn decoding_done(&self) -> bool {
+        self.decoder.decoding_done()
+    }
+
+    pub fn num_encoded_symbols_received(&self) -> usize {
+        self.decoder.num_encoded_symbols_received()
+    }
+
+    pub fn reconstruct_source_data(&self) -> Option<Vec<u8>> {
+        let mut data = Vec::with_capacity(self.num_source_symbols * self.symbol_len);
+
+        for i in 0..self.num_source_symbols {
+            match self.decoder.source_symbol_to_buffer_id(i) {
+                None => {
+                    return None;
+                }
+                Some(buffer_id) => {
+                    data.extend_from_slice(self.buffer_set.buffer(buffer_id));
+                }
+            }
+        }
+
+        Some(data)
+    }
+}

@@ -1,0 +1,16 @@
+# Lean build: the git-sourced crates we use (monad-bft networking crates + the category-labs
+# monoio fork) are vendored under vendor/ (~6 MB total) so that 'cargo build' does NOT clone the
+# monad-bft monorepo + its submodules (~4.5 GB of C++ engine + ethereum test vectors we never
+# compile). crates.io dependencies are still fetched normally from the registry.
+[source."git+https://github.com/category-labs/monad-bft?rev=413ba3c7fb4f25d394fb711bbe75ede115a7774f"]
+git = "https://github.com/category-labs/monad-bft"
+rev = "413ba3c7fb4f25d394fb711bbe75ede115a7774f"
+replace-with = "vendored-git"
+
+[source."git+https://github.com/category-labs/monoio.git?tag=0.2.4-category"]
+git = "https://github.com/category-labs/monoio.git"
+tag = "0.2.4-category"
+replace-with = "vendored-git"
+
+[source.vendored-git]
+directory = "vendor"
