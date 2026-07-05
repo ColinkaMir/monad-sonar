@@ -1,0 +1,53 @@
+{
+  "date": "2026-07-05",
+  "source": "monad-sonar off-node discovery",
+  "testnet": {
+    "peers_discovered": 130
+  },
+  "mainnet": {
+    "peers_discovered": 124,
+    "epoch": 1715,
+    "geo_coverage": {
+      "total_validators": 198,
+      "geo_located": 118,
+      "rtt_reachable_ips": 172,
+      "rtt_total_ips": 118,
+      "rtt_rounds": 7
+    },
+    "continents": [
+      {
+        "name": "EU",
+        "stake_pct": 63.09,
+        "count": 63,
+        "count_pct": 53.4,
+        "rtt_ms": 233
+      },
+      {
+        "name": "NA",
+        "stake_pct": 22.13,
+        "count": 31,
+        "count_pct": 26.3,
+        "rtt_ms": 148
+      },
+      {
+        "name": "APAC",
+        "stake_pct": 10.84,
+        "count": 18,
+        "count_pct": 15.3,
+        "rtt_ms": 67
+      },
+      {
+        "name": "Other",
+        "stake_pct": 3.94,
+        "count": 6,
+        "count_pct": 5.1,
+        "rtt_ms": 262
+      }
+    ],
+    "headline": {
+      "top4_provider_stake_pct": 52.65,
+      "hetzner_ovh_stake_pct": 23.54,
+      "bft_threshold_pct": 33.3
+    }
+  }
+}
