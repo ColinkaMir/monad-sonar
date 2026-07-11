@@ -2,17 +2,17 @@
   "date": "2026-07-11",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 196
+    "peers_discovered": 201
   },
   "mainnet": {
-    "peers_discovered": 206,
+    "peers_discovered": 410,
     "epoch": 1741,
     "geo_coverage": {
       "total_validators": 198,
       "geo_located": 198,
       "rtt_reachable_ips": 178,
       "rtt_total_ips": 196,
-      "rtt_rounds": 3
+      "rtt_rounds": 4
     },
     "continents": [
       {
