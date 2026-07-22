@@ -88,7 +88,7 @@ name records, and exports them.
 
 ## Hosted feeds
 
-Beyond self-hosting the CLI, ProofLine runs **public, continuously-updating feeds** you can
+Beyond self-hosting the CLI, Prooflines runs **public, continuously-updating feeds** you can
 pull from directly (testnet and mainnet), hosted separately from any Monad node host. Links
 to follow.
 
