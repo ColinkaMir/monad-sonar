@@ -6,13 +6,13 @@
   },
   "mainnet": {
     "peers_discovered": 410,
-    "epoch": 1792,
+    "epoch": 1793,
     "geo_coverage": {
       "total_validators": 198,
       "geo_located": 198,
       "rtt_reachable_ips": 178,
       "rtt_total_ips": 196,
-      "rtt_rounds": 5
+      "rtt_rounds": 1
     },
     "continents": [
       {
@@ -41,12 +41,12 @@
         "stake_pct": 3.54,
         "count": 8,
         "count_pct": 4.0,
-        "rtt_ms": 174
+        "rtt_ms": 172
       }
     ],
     "headline": {
-      "top4_provider_stake_pct": 51.94,
-      "top2_provider_stake_pct": 35.02,
+      "top4_provider_stake_pct": 51.93,
+      "top2_provider_stake_pct": 35.01,
       "bft_threshold_pct": 33.3
     }
   }
