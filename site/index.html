@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>monad-sonar peer feeds</title>
+  <!-- Open Graph / social link preview -->
+  <meta property="og:title" content="monad-sonar peer feeds">
+  <meta property="og:description" content="Open-source (GPLv3) tool that reads Monad's live peer and validator set off-node. Powers ProofLines' public testnet and mainnet peer feeds.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://prooflines.org/monad/sonar/">
+  <meta property="og:image" content="https://prooflines.org/og/sonar.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:site_name" content="Prooflines">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="monad-sonar peer feeds">
+  <meta name="twitter:description" content="Open-source (GPLv3) tool that reads Monad's live peer and validator set off-node. Powers ProofLines' public testnet and mainnet peer feeds.">
+  <meta name="twitter:image" content="https://prooflines.org/og/sonar.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Open-source (GPLv3) tool that reads Monad's live peer and validator set off-node. Public testnet and mainnet peer feeds, refreshed every 30 minutes, CORS-enabled.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0e1c; --panel:#0e1424; --panel2:#101830; --line:rgba(140,160,200,.14);
+    --ink:#eef1f6; --ink2:#b9c4dd; --muted:#8d99b5; --accent:#34d399; --accent2:#5f8afa;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:
+      radial-gradient(ellipse 640px 460px at 92% 4%, rgba(52,211,153,.10) 0%, transparent 62%),
+      linear-gradient(150deg,#0a0e1c 0%,#0a1020 55%,#070a14 100%);
+    color:var(--ink); font-family:"Space Grotesk",sans-serif; min-height:100vh;
+  }
+  .grid-bg{position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(140,160,200,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,200,.05) 1px,transparent 1px);
+    background-size:72px 72px;
+    -webkit-mask-image:radial-gradient(ellipse 90% 70% at 50% 0%,#000 25%,transparent 100%);}
+  .wrap{position:relative;z-index:1;max-width:56rem;margin:0 auto;padding:2rem 1.25rem 4rem}
+  a{color:var(--accent2);text-decoration:none} a:hover{text-decoration:underline}
+
+  .nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:3.2rem}
+  .brand{display:flex;align-items:center;gap:.7rem;color:var(--ink)}
+  .brand img{width:30px;height:30px}
+  .brand b{font-family:"Oxanium";font-size:.95rem;letter-spacing:.18em}
+  .brand span{font-family:"JetBrains Mono",monospace;font-size:.8rem;letter-spacing:.18em;color:var(--accent)}
+  .nav a.gh{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--muted);border:1px solid var(--line);padding:.45rem .8rem;border-radius:8px}
+  .nav a.gh:hover{color:var(--ink);text-decoration:none;border-color:rgba(52,211,153,.4)}
+
+  h1{font-family:"Oxanium";font-weight:700;font-size:clamp(2rem,6vw,3rem);letter-spacing:.02em}
+  .tagline{color:var(--ink2);font-size:1.12rem;margin:.7rem 0 1.1rem;max-width:38rem}
+  .accent-bar{width:120px;height:5px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));margin-bottom:1.4rem}
+  .chips{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2.6rem}
+  .chip{font-family:"JetBrains Mono",monospace;font-size:.74rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:.3rem .75rem}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.8rem;margin-bottom:2.8rem}
+  .tile{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+  .tile .label{font-size:.8rem;color:var(--muted);display:flex;align-items:center;gap:.45rem}
+  .tile .label .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(52,211,153,.6)}
+  .tile .value{font-weight:600;font-size:1.9rem;margin-top:.3rem}
+  .tile .sub{font-family:"JetBrains Mono",monospace;font-size:.72rem;color:var(--muted);margin-top:.2rem}
+
+  h2{font-family:"Oxanium";font-weight:600;font-size:1.05rem;letter-spacing:.12em;color:var(--ink2);text-transform:uppercase;margin:2.4rem 0 1rem}
+  .feeds{display:grid;gap:.7rem}
+  .feed{display:flex;justify-content:space-between;align-items:center;gap:1rem;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:.9rem 1.1rem;flex-wrap:wrap}
+  .feed:hover{border-color:rgba(52,211,153,.35)}
+  .feed .name{font-family:"JetBrains Mono",monospace;font-size:.92rem}
+  .feed .desc{color:var(--muted);font-size:.88rem;flex:1 1 16rem}
+  pre{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:1rem 1.15rem;overflow-x:auto;font-family:"JetBrains Mono",monospace;font-size:.85rem;line-height:1.65;color:var(--ink2)}
+  pre .c{color:var(--muted)} pre .g{color:var(--accent)}
+  .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.8rem}
+  .how .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem 1.1rem}
+  .how .card b{display:block;font-family:"Oxanium";font-size:.95rem;margin-bottom:.35rem;color:var(--ink)}
+  .how .card p{color:var(--muted);font-size:.9rem}
+  footer{margin-top:3.2rem;padding-top:1.4rem;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="wrap">
+
+  <nav class="nav">
+    <a class="brand" href="../index.html" aria-label="Prooflines Monad home">
+      <img src="../assets/logo-consensus-grid.svg" alt="Prooflines logo">
+      <b>PROOFLINES</b>&nbsp;<span>· SONAR</span>
+    </a>
+    <a class="gh" href="https://github.com/ColinkaMir/monad-sonar">GitHub ↗</a>
+  </nav>
+
+  <h1>monad-sonar</h1>
+  <p class="tagline">Read the Monad validator peer set <b>without running a node</b> — by speaking the discovery protocol directly, from any ordinary server.</p>
+  <div class="accent-bar"></div>
+  <div class="chips">
+    <span class="chip">open source · GPLv3</span>
+    <span class="chip">testnet + mainnet</span>
+    <span class="chip">off-node</span>
+    <span class="chip">CORS-enabled feeds</span>
+  </div>
+
+  <div class="stats" aria-label="Live feed stats">
+    <div class="tile"><div class="label"><span class="dot"></span>Mainnet peers</div><div class="value" id="mn">—</div><div class="sub" id="mn-upd"></div></div>
+    <div class="tile"><div class="label"><span class="dot"></span>Testnet peers</div><div class="value" id="tn">—</div><div class="sub" id="tn-upd"></div></div>
+    <div class="tile"><div class="label">Refresh cadence</div><div class="value">30 min</div><div class="sub">systemd timer, off-node</div></div>
+  </div>
+
+  <h2>Public feeds</h2>
+  <div class="feeds">
+    <a class="feed" href="mainnet-peers.json"><span class="name">mainnet-peers.json</span><span class="desc">live mainnet peer name records</span></a>
+    <a class="feed" href="testnet-peers.json"><span class="name">testnet-peers.json</span><span class="desc">live testnet peer name records</span></a>
+    <a class="feed" href="index.json"><span class="name">index.json</span><span class="desc">peer counts + refresh timestamps</span></a>
+  </div>
+  <p style="color:var(--muted);font-size:.9rem;margin-top:.8rem">Each record is <code style="font-family:'JetBrains Mono',monospace">{ secp, ip, port, authPort, seq }</code> — the same name records the protocol defines. CORS is open, fetch them straight from a browser dApp or explorer.</p>
+
+  <h2>How it works</h2>
+  <div class="how">
+    <div class="card"><b>Protocol-faithful</b><p>Speaks Monad's real peer-discovery protocol (authenticated ping/pong + PeerLookup), reusing the official monad-bft crates.</p></div>
+    <div class="card"><b>Off the validator</b><p>Runs anywhere — a laptop, CI, a small VPS. Nothing touches a signing host, no NVMe, no state sync.</p></div>
+    <div class="card"><b>Composable</b><p>A building block for explorers, dashboards and observed-data layers. Prooflines' geo-latency map runs on these feeds.</p></div>
+  </div>
+
+  <h2>Run it yourself</h2>
+  <pre><span class="c"># build (pure Rust, ~9.5 MB clone, no node required)</span>
+git clone https://github.com/ColinkaMir/monad-sonar && cd monad-sonar
+cargo build --release
+
+<span class="c"># read the testnet or mainnet peer set, write JSON</span>
+./target/release/monad-sonar --network mainnet peers \
+  --config configs/mainnet.toml --run-secs 100 --out <span class="g">peers.json</span></pre>
+
+  <footer>
+    <span>© 2026 Prooflines · GPL-3.0</span>
+    <span><a href="https://github.com/ColinkaMir/monad-sonar">github.com/ColinkaMir/monad-sonar</a> · <a href="../index.html">prooflines.org/monad</a></span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  function rel(iso){
+    if(!iso) return "";
+    var m = Math.round((Date.now() - new Date(iso).getTime())/60000);
+    if (m < 1) return "updated just now";
+    if (m < 60) return "updated " + m + " min ago";
+    return "updated " + Math.round(m/60) + " h ago";
+  }
+  fetch("index.json",{cache:"no-cache"}).then(function(r){return r.json()}).then(function(d){
+    var f = d.feeds || {};
+    if (f.mainnet){ document.getElementById("mn").textContent = f.mainnet.peers; document.getElementById("mn-upd").textContent = rel(f.mainnet.updated_at); }
+    if (f.testnet){ document.getElementById("tn").textContent = f.testnet.peers; document.getElementById("tn-upd").textContent = rel(f.testnet.updated_at); }
+  }).catch(function(){});
+})();
+</script>
+</body>
+</html>
