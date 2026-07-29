@@ -1,0 +1,17 @@
+# Example unit for the union daemon (one instance per network).
+# Install as monad-sonar-<network>-daemon.service, set NETWORK accordingly.
+[Unit]
+Description=Continuous %i sonar union daemon -> %i-peers-union.json
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=simple
+User=solana
+Environment=NETWORK=%i
+Environment=SLEEP_SECS=300
+ExecStart=/usr/bin/python3 /path/to/monad-sonar/tools/union-daemon.py
+Restart=always
+RestartSec=30
+Nice=15
+[Install]
+WantedBy=multi-user.target
