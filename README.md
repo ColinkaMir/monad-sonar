@@ -6,8 +6,11 @@
 validator **name records** (endpoints) from a laptop, a small VPS, or CI — never on a host
 that runs a Monad node.
 
-> Status: **working v1 (testnet).** Authenticated discovery + peer-lookup run live and export
-> JSON; a 100s testnet pass discovers ~195 peer name records. Mainnet bootstrap + hosted feeds next.
+> Status: **production, both networks.** Authenticated discovery + peer-lookup run continuously on
+> testnet and mainnet; the hosted feeds at
+> [prooflines.org/monad/sonar](https://prooflines.org/monad/sonar/) are built by exactly this code,
+> refreshed hourly, with daily snapshots to GitHub. A ~100s pass discovers the live peer set
+> (~440 records on mainnet as of August 2026).
 
 ## Why
 

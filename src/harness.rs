@@ -428,3 +428,33 @@ pub async fn run_peers(
     }
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // A 33-byte compressed secp256k1 pubkey from configs/validators.example.toml.
+    const VALID_SECP: &str =
+        "0x037ca3ad118c787c0b1faf10aec8569818af8e0789fb2fe8ab1332f89e5ece406e";
+
+    #[test]
+    fn parses_a_valid_secp_pubkey() {
+        assert!(node_id_from_hex(VALID_SECP).is_ok());
+    }
+
+    #[test]
+    fn accepts_hex_without_0x_prefix() {
+        assert!(node_id_from_hex(VALID_SECP.trim_start_matches("0x")).is_ok());
+    }
+
+    #[test]
+    fn rejects_non_hex() {
+        assert!(node_id_from_hex("0xnothex").is_err());
+    }
+
+    #[test]
+    fn rejects_wrong_length() {
+        // 32 bytes: valid hex, wrong size for a compressed pubkey.
+        assert!(node_id_from_hex(&"ab".repeat(32)).is_err());
+    }
+}
