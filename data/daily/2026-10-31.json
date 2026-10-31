@@ -1,0 +1,59 @@
+{
+  "date": "2026-10-31",
+  "source": "monad-sonar off-node discovery",
+  "testnet": {
+    "peers_discovered": 417
+  },
+  "mainnet": {
+    "peers_discovered": 416,
+    "epoch": 2363,
+    "geo_coverage": {
+      "total_validators": 195,
+      "geo_located": 195,
+      "rtt_reachable_ips": 174,
+      "rtt_total_ips": 193,
+      "rtt_rounds": 7,
+      "rtt_measured_stake_pct": 89.48,
+      "rtt_unmeasured_stake_pct": 10.52,
+      "distinct_addresses": 193,
+      "addresses_with_multiple_validators": 2
+    },
+    "continents": [
+      {
+        "name": "EU",
+        "stake_pct": 60.97,
+        "count": 107,
+        "count_pct": 54.9,
+        "rtt_ms": 22
+      },
+      {
+        "name": "NA",
+        "stake_pct": 24.41,
+        "count": 55,
+        "count_pct": 28.2,
+        "rtt_ms": 118
+      },
+      {
+        "name": "APAC",
+        "stake_pct": 10.96,
+        "count": 25,
+        "count_pct": 12.8,
+        "rtt_ms": 182
+      },
+      {
+        "name": "Other",
+        "stake_pct": 3.66,
+        "count": 8,
+        "count_pct": 4.1,
+        "rtt_ms": 170
+      }
+    ],
+    "headline": {
+      "top4_provider_stake_pct": 54.82,
+      "top2_provider_stake_pct": 32.1,
+      "top4_asn_stake_pct": 48.53,
+      "top2_asn_stake_pct": 32.1,
+      "bft_threshold_pct": 33.3
+    }
+  }
+}
