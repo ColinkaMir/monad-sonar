@@ -1,20 +1,20 @@
 {
-  "date": "2026-11-05",
+  "date": "2026-11-06",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 355
+    "peers_discovered": 408
   },
   "mainnet": {
-    "peers_discovered": 404,
-    "epoch": 2392,
+    "peers_discovered": 408,
+    "epoch": 2397,
     "geo_coverage": {
       "total_validators": 194,
       "geo_located": 194,
       "rtt_reachable_ips": 172,
       "rtt_total_ips": 192,
-      "rtt_rounds": 3,
-      "rtt_measured_stake_pct": 89.13,
-      "rtt_unmeasured_stake_pct": 10.87,
+      "rtt_rounds": 9,
+      "rtt_measured_stake_pct": 89.12,
+      "rtt_unmeasured_stake_pct": 10.88,
       "distinct_addresses": 192,
       "addresses_with_multiple_validators": 2
     },
@@ -28,31 +28,31 @@
       },
       {
         "name": "NA",
-        "stake_pct": 24.43,
+        "stake_pct": 24.42,
         "count": 55,
         "count_pct": 28.4,
         "rtt_ms": 116
       },
       {
         "name": "APAC",
-        "stake_pct": 10.95,
+        "stake_pct": 10.96,
         "count": 25,
         "count_pct": 12.9,
         "rtt_ms": 184
       },
       {
         "name": "Other",
-        "stake_pct": 3.66,
+        "stake_pct": 3.67,
         "count": 8,
         "count_pct": 4.1,
-        "rtt_ms": 174
+        "rtt_ms": 167
       }
     ],
     "headline": {
-      "top4_provider_stake_pct": 54.58,
-      "top2_provider_stake_pct": 32.15,
-      "top4_asn_stake_pct": 48.27,
-      "top2_asn_stake_pct": 32.15,
+      "top4_provider_stake_pct": 54.57,
+      "top2_provider_stake_pct": 32.1,
+      "top4_asn_stake_pct": 48.24,
+      "top2_asn_stake_pct": 32.1,
       "bft_threshold_pct": 33.3
     }
   }
