@@ -1,41 +1,43 @@
 {
-  "date": "2026-11-11",
+  "date": "2026-11-12",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 405
+    "peers_discovered": 404,
+    "peers_union": 404
   },
   "mainnet": {
-    "peers_discovered": 406,
-    "epoch": 2426,
+    "peers_discovered": 399,
+    "peers_union": 402,
+    "epoch": 2433,
     "geo_coverage": {
       "total_validators": 194,
       "geo_located": 194,
-      "rtt_reachable_ips": 172,
+      "rtt_reachable_ips": 171,
       "rtt_total_ips": 192,
-      "rtt_rounds": 4,
-      "rtt_measured_stake_pct": 89.07,
-      "rtt_unmeasured_stake_pct": 10.93,
+      "rtt_rounds": 1,
+      "rtt_measured_stake_pct": 88.66,
+      "rtt_unmeasured_stake_pct": 11.34,
       "distinct_addresses": 192,
       "addresses_with_multiple_validators": 2
     },
     "continents": [
       {
         "name": "EU",
-        "stake_pct": 61.02,
+        "stake_pct": 61.04,
         "count": 106,
         "count_pct": 54.6,
         "rtt_ms": 22
       },
       {
         "name": "NA",
-        "stake_pct": 24.41,
+        "stake_pct": 24.4,
         "count": 55,
         "count_pct": 28.4,
         "rtt_ms": 117
       },
       {
         "name": "APAC",
-        "stake_pct": 10.92,
+        "stake_pct": 10.91,
         "count": 25,
         "count_pct": 12.9,
         "rtt_ms": 180
@@ -45,15 +47,29 @@
         "stake_pct": 3.66,
         "count": 8,
         "count_pct": 4.1,
-        "rtt_ms": 174
+        "rtt_ms": 168
       }
     ],
     "headline": {
       "top4_provider_stake_pct": 54.45,
-      "top2_provider_stake_pct": 32.02,
-      "top4_asn_stake_pct": 48.12,
-      "top2_asn_stake_pct": 32.02,
+      "top2_provider_stake_pct": 32.03,
+      "top4_asn_stake_pct": 48.13,
+      "top2_asn_stake_pct": 32.03,
       "bft_threshold_pct": 33.3
-    }
+    },
+    "top_providers": [
+      {
+        "name": "TeraSwitch Networks Inc.",
+        "stake_pct": 16.8
+      },
+      {
+        "name": "OVH SAS",
+        "stake_pct": 15.23
+      },
+      {
+        "name": "UAB \"Cherry Servers\"",
+        "stake_pct": 11.63
+      }
+    ]
   }
 }

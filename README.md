@@ -9,7 +9,7 @@ that runs a Monad node.
 > Status: **production, both networks.** Authenticated discovery + peer-lookup run continuously on
 > testnet and mainnet; the hosted feeds at
 > [prooflines.org/monad/sonar](https://prooflines.org/monad/sonar/) are built by exactly this code,
-> refreshed hourly. A ~100s pass discovers the live peer set
+> refreshed hourly, with a [daily network report](NETWORK.md). A ~100s pass discovers the live peer set
 > (~440 records on mainnet as of August 2026).
 
 ## Why
