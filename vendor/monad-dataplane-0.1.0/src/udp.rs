@@ -293,15 +293,29 @@ async fn rx_multishot_socket(
             DEFAULT_RINGBUF_SIZE as usize,
             group_id,
         )
-        .expect("failed to create buffer ring")
     };
 
-    let mut ring = create_ring();
+    // Backport of category-labs/monad-bft#3201 (merged 2026-08-11, dffb79e5): Ubuntu 24.04
+    // 6.8.0-136..139 (and in our testing 6.8.0-149 on 22.04 HWE) ship a faulty io_uring
+    // backport, so provided buffer-ring registration fails with EINVAL. Fall back to the
+    // single-shot recv_from reader instead of panicking; later recreation stays fatal.
+    let mut ring = match create_ring() {
+        Ok(ring) => ring,
+        Err(err) => {
+            warn!(
+                ?err,
+                "failed to create multishot buffer ring, falling back to single-shot UDP receiver"
+            );
+            return rx_single_socket(socket, udp_ingress_tx).await;
+        }
+    };
 
     loop {
         match run_multishot_stream(&socket, &udp_ingress_tx, ring).await {
             MultishotResult::ReuseRing(r) => ring = r,
-            MultishotResult::RecreateRing => ring = create_ring(),
+            MultishotResult::RecreateRing => {
+                ring = create_ring().expect("failed to recreate multishot buffer ring")
+            }
             MultishotResult::ChannelClosed => return,
         }
     }
