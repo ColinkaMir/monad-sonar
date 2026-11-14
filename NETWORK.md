@@ -4,6 +4,7 @@ One line a day from monad-sonar's hosted feeds; each date links to that day's re
 
 | Date | Mainnet peers | Testnet peers | Validators located | EU stake | Top-4 providers |
 |---|---|---|---|---|---|
+| [2026-11-14](reports/2026-11/2026-11-14.md) | 396 | 396 | 194 | 61.1% | 54.4% |
 | [2026-11-13](reports/2026-11/2026-11-13.md) | 397 | 404 | 194 | 61.0% | 54.4% |
 | [2026-11-12](reports/2026-11/2026-11-12.md) | 399 | 404 | 194 | 61.0% | 54.5% |
 | 2026-11-11 | 406 | 405 | 194 | 61.0% | 54.5% |
@@ -17,4 +18,3 @@ One line a day from monad-sonar's hosted feeds; each date links to that day's re
 | 2026-11-03 | 404 | 284 | 194 | 60.9% | 54.6% |
 | 2026-11-02 | 406 | 395 | 195 | 61.0% | 54.8% |
 | 2026-11-01 | 409 | 403 | 195 | 61.0% | 54.8% |
-| 2026-10-31 | 416 | 417 | 195 | 61.0% | 54.8% |
