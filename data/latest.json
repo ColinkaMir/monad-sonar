@@ -1,74 +1,74 @@
 {
-  "date": "2026-11-18",
+  "date": "2026-11-19",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 397,
-    "peers_union": 427
+    "peers_discovered": 389,
+    "peers_union": 425
   },
   "mainnet": {
-    "peers_discovered": 396,
-    "peers_union": 427,
-    "epoch": 2466,
+    "peers_discovered": 406,
+    "peers_union": 425,
+    "epoch": 2471,
     "geo_coverage": {
-      "total_validators": 194,
-      "geo_located": 194,
-      "rtt_reachable_ips": 172,
-      "rtt_total_ips": 192,
-      "rtt_rounds": 2,
-      "rtt_measured_stake_pct": 88.83,
-      "rtt_unmeasured_stake_pct": 11.17,
-      "distinct_addresses": 192,
+      "total_validators": 197,
+      "geo_located": 197,
+      "rtt_reachable_ips": 175,
+      "rtt_total_ips": 195,
+      "rtt_rounds": 8,
+      "rtt_measured_stake_pct": 89.02,
+      "rtt_unmeasured_stake_pct": 10.98,
+      "distinct_addresses": 195,
       "addresses_with_multiple_validators": 2
     },
     "continents": [
       {
         "name": "EU",
-        "stake_pct": 60.57,
-        "count": 105,
-        "count_pct": 54.1,
+        "stake_pct": 60.52,
+        "count": 107,
+        "count_pct": 54.3,
         "rtt_ms": 22
       },
       {
         "name": "NA",
-        "stake_pct": 23.96,
+        "stake_pct": 23.92,
         "count": 54,
-        "count_pct": 27.8,
-        "rtt_ms": 114
+        "count_pct": 27.4,
+        "rtt_ms": 117
       },
       {
         "name": "APAC",
-        "stake_pct": 11.26,
-        "count": 26,
-        "count_pct": 13.4,
-        "rtt_ms": 180
+        "stake_pct": 11.43,
+        "count": 27,
+        "count_pct": 13.7,
+        "rtt_ms": 184
       },
       {
         "name": "Other",
-        "stake_pct": 4.2,
+        "stake_pct": 4.13,
         "count": 9,
         "count_pct": 4.6,
-        "rtt_ms": 183
+        "rtt_ms": 182
       }
     ],
     "headline": {
-      "top4_provider_stake_pct": 54.38,
-      "top2_provider_stake_pct": 31.98,
-      "top4_asn_stake_pct": 48.11,
-      "top2_asn_stake_pct": 31.98,
+      "top4_provider_stake_pct": 53.97,
+      "top2_provider_stake_pct": 31.26,
+      "top4_asn_stake_pct": 47.8,
+      "top2_asn_stake_pct": 31.26,
       "bft_threshold_pct": 33.3
     },
     "top_providers": [
       {
         "name": "TeraSwitch Networks Inc.",
-        "stake_pct": 16.78
+        "stake_pct": 16.49
       },
       {
         "name": "OVH SAS",
-        "stake_pct": 15.2
+        "stake_pct": 14.77
       },
       {
         "name": "UAB \"Cherry Servers\"",
-        "stake_pct": 11.58
+        "stake_pct": 11.39
       }
     ]
   }
