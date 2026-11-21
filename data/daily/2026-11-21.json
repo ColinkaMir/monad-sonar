@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-21",
+  "source": "monad-sonar off-node discovery",
+  "testnet": {
+    "peers_discovered": 404,
+    "peers_union": 423
+  },
+  "mainnet": {
+    "peers_discovered": 401,
+    "peers_union": 423,
+    "epoch": 2483,
+    "geo_coverage": {
+      "total_validators": 197,
+      "geo_located": 197,
+      "rtt_reachable_ips": 175,
+      "rtt_total_ips": 195,
+      "rtt_rounds": 2,
+      "rtt_measured_stake_pct": 89.03,
+      "rtt_unmeasured_stake_pct": 10.97,
+      "distinct_addresses": 195,
+      "addresses_with_multiple_validators": 2
+    },
+    "continents": [
+      {
+        "name": "EU",
+        "stake_pct": 60.57,
+        "count": 107,
+        "count_pct": 54.3,
+        "rtt_ms": 22
+      },
+      {
+        "name": "NA",
+        "stake_pct": 23.89,
+        "count": 54,
+        "count_pct": 27.4,
+        "rtt_ms": 116
+      },
+      {
+        "name": "APAC",
+        "stake_pct": 11.42,
+        "count": 27,
+        "count_pct": 13.7,
+        "rtt_ms": 179
+      },
+      {
+        "name": "Other",
+        "stake_pct": 4.13,
+        "count": 9,
+        "count_pct": 4.6,
+        "rtt_ms": 183
+      }
+    ],
+    "headline": {
+      "top4_provider_stake_pct": 53.96,
+      "top2_provider_stake_pct": 31.26,
+      "top4_asn_stake_pct": 47.8,
+      "top2_asn_stake_pct": 31.26,
+      "bft_threshold_pct": 33.3
+    },
+    "top_providers": [
+      {
+        "name": "TeraSwitch Networks Inc.",
+        "stake_pct": 16.52
+      },
+      {
+        "name": "OVH SAS",
+        "stake_pct": 14.74
+      },
+      {
+        "name": "UAB \"Cherry Servers\"",
+        "stake_pct": 11.38
+      }
+    ]
+  }
+}

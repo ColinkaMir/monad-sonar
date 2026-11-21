@@ -1,20 +1,20 @@
 {
-  "date": "2026-11-20",
+  "date": "2026-11-21",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 384,
-    "peers_union": 424
+    "peers_discovered": 404,
+    "peers_union": 423
   },
   "mainnet": {
-    "peers_discovered": 404,
-    "peers_union": 424,
-    "epoch": 2477,
+    "peers_discovered": 401,
+    "peers_union": 423,
+    "epoch": 2483,
     "geo_coverage": {
       "total_validators": 197,
       "geo_located": 197,
       "rtt_reachable_ips": 175,
       "rtt_total_ips": 195,
-      "rtt_rounds": 5,
+      "rtt_rounds": 2,
       "rtt_measured_stake_pct": 89.03,
       "rtt_unmeasured_stake_pct": 10.97,
       "distinct_addresses": 195,
@@ -33,21 +33,21 @@
         "stake_pct": 23.89,
         "count": 54,
         "count_pct": 27.4,
-        "rtt_ms": 117
+        "rtt_ms": 116
       },
       {
         "name": "APAC",
         "stake_pct": 11.42,
         "count": 27,
         "count_pct": 13.7,
-        "rtt_ms": 185
+        "rtt_ms": 179
       },
       {
         "name": "Other",
-        "stake_pct": 4.12,
+        "stake_pct": 4.13,
         "count": 9,
         "count_pct": 4.6,
-        "rtt_ms": 178
+        "rtt_ms": 183
       }
     ],
     "headline": {
