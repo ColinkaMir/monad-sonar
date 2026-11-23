@@ -1,74 +1,74 @@
 {
-  "date": "2026-11-22",
+  "date": "2026-11-23",
   "source": "monad-sonar off-node discovery",
   "testnet": {
-    "peers_discovered": 367,
-    "peers_union": 423
+    "peers_discovered": 393,
+    "peers_union": 424
   },
   "mainnet": {
     "peers_discovered": 402,
-    "peers_union": 423,
-    "epoch": 2488,
+    "peers_union": 424,
+    "epoch": 2494,
     "geo_coverage": {
       "total_validators": 197,
       "geo_located": 197,
       "rtt_reachable_ips": 175,
       "rtt_total_ips": 195,
-      "rtt_rounds": 8,
-      "rtt_measured_stake_pct": 89.02,
-      "rtt_unmeasured_stake_pct": 10.98,
+      "rtt_rounds": 5,
+      "rtt_measured_stake_pct": 89.0,
+      "rtt_unmeasured_stake_pct": 11.0,
       "distinct_addresses": 195,
       "addresses_with_multiple_validators": 2
     },
     "continents": [
       {
         "name": "EU",
-        "stake_pct": 59.88,
+        "stake_pct": 59.86,
         "count": 106,
         "count_pct": 53.8,
         "rtt_ms": 22
       },
       {
         "name": "NA",
-        "stake_pct": 23.91,
+        "stake_pct": 23.9,
         "count": 54,
         "count_pct": 27.4,
         "rtt_ms": 116
       },
       {
         "name": "APAC",
-        "stake_pct": 11.4,
+        "stake_pct": 11.42,
         "count": 27,
         "count_pct": 13.7,
         "rtt_ms": 181
       },
       {
         "name": "Other",
-        "stake_pct": 4.81,
+        "stake_pct": 4.82,
         "count": 10,
         "count_pct": 5.1,
-        "rtt_ms": 183
+        "rtt_ms": 178
       }
     ],
     "headline": {
-      "top4_provider_stake_pct": 53.28,
-      "top2_provider_stake_pct": 31.27,
-      "top4_asn_stake_pct": 47.8,
-      "top2_asn_stake_pct": 31.27,
+      "top4_provider_stake_pct": 53.02,
+      "top2_provider_stake_pct": 30.96,
+      "top4_asn_stake_pct": 47.71,
+      "top2_asn_stake_pct": 30.96,
       "bft_threshold_pct": 33.3
     },
     "top_providers": [
       {
         "name": "TeraSwitch Networks Inc.",
-        "stake_pct": 16.53
+        "stake_pct": 16.36
       },
       {
         "name": "OVH SAS",
-        "stake_pct": 14.74
+        "stake_pct": 14.6
       },
       {
         "name": "Hetzner Online GmbH",
-        "stake_pct": 11.32
+        "stake_pct": 11.35
       }
     ]
   }
