@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-25",
+  "source": "monad-sonar off-node discovery",
+  "testnet": {
+    "peers_discovered": 406,
+    "peers_union": 425
+  },
+  "mainnet": {
+    "peers_discovered": 406,
+    "peers_union": 425,
+    "epoch": 2505,
+    "geo_coverage": {
+      "total_validators": 196,
+      "geo_located": 196,
+      "rtt_reachable_ips": 173,
+      "rtt_total_ips": 194,
+      "rtt_rounds": 9,
+      "rtt_measured_stake_pct": 88.74,
+      "rtt_unmeasured_stake_pct": 11.26,
+      "distinct_addresses": 194,
+      "addresses_with_multiple_validators": 2
+    },
+    "continents": [
+      {
+        "name": "EU",
+        "stake_pct": 59.7,
+        "count": 105,
+        "count_pct": 53.6,
+        "rtt_ms": 22
+      },
+      {
+        "name": "NA",
+        "stake_pct": 24.76,
+        "count": 54,
+        "count_pct": 27.6,
+        "rtt_ms": 116
+      },
+      {
+        "name": "APAC",
+        "stake_pct": 10.5,
+        "count": 26,
+        "count_pct": 13.3,
+        "rtt_ms": 182
+      },
+      {
+        "name": "Other",
+        "stake_pct": 5.04,
+        "count": 11,
+        "count_pct": 5.6,
+        "rtt_ms": 184
+      }
+    ],
+    "headline": {
+      "top4_provider_stake_pct": 52.41,
+      "top2_provider_stake_pct": 30.72,
+      "top4_asn_stake_pct": 48.18,
+      "top2_asn_stake_pct": 30.72,
+      "bft_threshold_pct": 33.3
+    },
+    "top_providers": [
+      {
+        "name": "TeraSwitch Networks Inc.",
+        "stake_pct": 16.86
+      },
+      {
+        "name": "OVH SAS",
+        "stake_pct": 13.86
+      },
+      {
+        "name": "Hetzner Online GmbH",
+        "stake_pct": 11.25
+      }
+    ]
+  }
+}
